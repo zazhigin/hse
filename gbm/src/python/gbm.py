@@ -1,7 +1,7 @@
 from __future__ import print_function
 import pandas as pd
 import numpy as np
-from sklearn import cross_validation
+from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.metrics import log_loss
 import operator
@@ -29,7 +29,7 @@ data_sample.to_csv('../../data/gbm-data-sample.csv', index=False)
 X = np.array(data.values[0::, 1::])
 y = np.array(data.values[0::, 0])
 
-X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.8, random_state=241)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.8, random_state=241)
 
 clf = GBM(250, 0.2)
 clf.fit(X_train, y_train)
