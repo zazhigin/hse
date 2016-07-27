@@ -1,0 +1,80 @@
+Предсказание победителя по первым 5-ти минутам игры Dota 2
+
+Подход 1: градиентный бустинг "в лоб"
+
+max_depth=3
+Time elapsed: 23 seconds  n_estimators = 10  ROC_AUC = 0.6075
+Time elapsed: 43 seconds  n_estimators = 20  ROC_AUC = 0.6245
+Time elapsed: 63 seconds  n_estimators = 30  ROC_AUC = 0.6318
+
+max_depth=2
+Time elapsed: 13 seconds  n_estimators = 10  ROC_AUC = 0.5889
+Time elapsed: 24 seconds  n_estimators = 20  ROC_AUC = 0.6159
+Time elapsed: 35 seconds  n_estimators = 30  ROC_AUC = 0.6259
+Time elapsed: 45 seconds  n_estimators = 40  ROC_AUC = 0.6298
+Time elapsed: 56 seconds  n_estimators = 50  ROC_AUC = 0.6327
+
+max_depth=3, train_size=0.5
+Time elapsed: 11 seconds  max_depth = 3  ROC_AUC = 0.6100
+Time elapsed: 21 seconds  max_depth = 3  ROC_AUC = 0.6287
+Time elapsed: 31 seconds  max_depth = 3  ROC_AUC = 0.6351
+
+1.
+Следующие признаки имеют пропуски среди своих значений:
+first_blood_time
+first_blood_team
+first_blood_player1
+first_blood_player2
+radiant_bottle_time
+radiant_courier_time
+radiant_flying_courier_time
+radiant_first_ward_time
+dire_bottle_time
+dire_courier_time
+dire_flying_courier_time
+dire_first_ward_time
+
+Для first_blood_time и dire_first_ward_time пропуски означают, что за первые 5 минут матча соответствующее событие не наступает.
+
+2. radiant_win - cтолбец с целевой переменной.
+
+3. Кросс-валидация для градиентного бустинга с 30 деревьями длилась 1 минуту и 3 секунды и было получено качество ROC_AUC=0.63
+
+4. Увелечение количества деревьев до 40 и 50 не приносит существенного улучшения качества, однако время обучения увеличивается существенно. Поэтому в данной задаче 30 деревьев имеет достаточную точность при оптимальном времени обучения. Увеличить скорость обучения можно двумя способами:
+1). Использовать max_depth=2 (в этом случае скорость обучения увеличивается почти в 2 раза, при ухудшение точности на 1% при аналогичном числе деревьев)
+2). Использовать подмножество исходной выборки, например с помощью train_test_split(X, y, train_size=0.5). Метод хорош тем, что обучение с кроссвалидацией и подбор параметров числа деревьев и глубины можно осуществить на небольшой подвыборке. В данной задаче скорость кросвалидации выросла в более чем в 2 раза при использовании 50% подмножества исходной выборки.
+
+
+Подход 2: логистическая регрессия
+
+Time elapsed: 5 seconds  C = 0.0001  ROC_AUC = 0.65111
+Time elapsed: 8 seconds  C = 0.001  ROC_AUC = 0.65387
+Time elapsed: 13 seconds  C = 0.01  ROC_AUC = 0.65423
+Time elapsed: 13 seconds  C = 0.1  ROC_AUC = 0.65418
+Time elapsed: 13 seconds  C = 1.0  ROC_AUC = 0.65408
+with categorial C= 0.01  max_score= 0.65423135849
+
+Time elapsed: 4 seconds  C = 0.0001  ROC_AUC = 0.65072
+Time elapsed: 8 seconds  C = 0.001  ROC_AUC = 0.65376
+Time elapsed: 11 seconds  C = 0.01  ROC_AUC = 0.65371
+Time elapsed: 12 seconds  C = 0.1  ROC_AUC = 0.65364
+Time elapsed: 12 seconds  C = 1.0  ROC_AUC = 0.65363
+no categorial C= 0.001  max_score= 0.653756089175
+
+Time elapsed: 27 seconds  C = 1.0  ROC_AUC = 0.68179
+Time elapsed: 27 seconds  C = 10.0  ROC_AUC = 0.68181
+Time elapsed: 27 seconds  C = 100.0  ROC_AUC = 0.68183
+Time elapsed: 27 seconds  C = 1000.0  ROC_AUC = 0.68183
+Time elapsed: 27 seconds  C = 10000.0  ROC_AUC = 0.68183
+with words bag C= 1000.0  max_score= 0.681825643955
+
+1. Наилучшее качество для логистической регрессии ROC_AUC=0.65423 при оптимальном C=0.01 и эта точность немного выше, чем у градиентного бустинга. Думаю это связано с большим числом признаков и некоторой степенью разреженности данных, а это ситуация когда линейные методы работают лучше градиентного бустинга. Логистическая регрессия работает 5 раз быстрее градиентного бустинга.
+
+2. Качество при отсутствии категориальных признаков ROC_AUC=0.65375 при оптимальном C=0.001 немного ухудшилось. Видимо часть значимой информации всё таки было потеряно, не смотря на использование категориальных признаков без dummy-кодирования.
+
+3. Всего в игре существует 108 различных героя.
+
+4. Использование мешка слов значительно улучшило качество модели ROC_AUC=0.68183 при оптимальном C=1000.0 Это объясняется правильным кодированием информации о героях.
+
+5. Минимальное значение прогноза на тестовой выборке 0.0033, а максимальное 0.9915
+
