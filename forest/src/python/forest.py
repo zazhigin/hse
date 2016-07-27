@@ -1,7 +1,7 @@
 from __future__ import print_function
 import pandas as pd
 import numpy as np
-from sklearn.cross_validation import KFold
+from sklearn.cross_validation import KFold, cross_val_score
 from sklearn.ensemble import RandomForestRegressor
 from sklearn import cross_validation
 
@@ -13,7 +13,7 @@ class Forest:
         for n in range(1, 51):
             kf = KFold(len(X), n_folds=5, shuffle=True, random_state=1)
             clf = RandomForestRegressor(n_estimators=n, random_state=1)
-            scores = cross_validation.cross_val_score(clf, X, y, scoring='r2', cv=kf)
+            scores = cross_val_score(clf, X, y, scoring='r2', cv=kf)
             mean = scores.mean()
             if mean > self.quality:
                 return n
