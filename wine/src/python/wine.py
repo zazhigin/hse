@@ -2,7 +2,7 @@ from __future__ import print_function
 import pandas as pd
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.cross_validation import KFold
+from sklearn.cross_validation import KFold, cross_val_score
 from sklearn import cross_validation
 from sklearn.preprocessing import scale
 import operator
@@ -16,7 +16,7 @@ class Classifier:
         for k in range(1, self.n+1):
             kf = KFold(len(X), n_folds=5, shuffle=True, random_state=42)
             knn = KNeighborsClassifier(n_neighbors=k)
-            scores = cross_validation.cross_val_score(knn, X, y, cv=kf, scoring='accuracy')
+            scores = cross_val_score(knn, X, y, cv=kf, scoring='accuracy')
             mean = scores.mean()
             means.append(mean)
 
