@@ -1,7 +1,7 @@
 from __future__ import print_function
 from sklearn import datasets
 from sklearn.preprocessing import scale
-from sklearn.cross_validation import KFold
+from sklearn.cross_validation import KFold, cross_val_score
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn import cross_validation
 import numpy as np
@@ -12,7 +12,7 @@ class Regression:
         for p in np.linspace(1, 10, num=200):
             kf = KFold(len(X), n_folds=5, shuffle=True, random_state=42)
             knn = KNeighborsRegressor(n_neighbors=5, weights='distance', p=p, metric='minkowski')
-            scores = cross_validation.cross_val_score(knn, X, y, cv=kf, scoring='mean_squared_error')
+            scores = cross_val_score(knn, X, y, cv=kf, scoring='mean_squared_error')
             means[p] = scores.mean()
         return max(means, key=means.get)
 
