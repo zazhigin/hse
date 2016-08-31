@@ -3,7 +3,6 @@ from sklearn import datasets
 from sklearn.preprocessing import scale
 from sklearn.cross_validation import KFold, cross_val_score
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn import cross_validation
 import numpy as np
 
 class Regression:
